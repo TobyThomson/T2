@@ -42,7 +42,7 @@ backButton.addEventListener("click", function(){
     gamePage.style.display = "none";
     backButton.style.display = "none";
 
-    title.textContent = "UTTT";
+    title.textContent = "Player " + PlayerTurn + "\'s Turn";
 });
 
 function drawResponsiveElements() {
@@ -182,6 +182,8 @@ function makeMove(subBoard, row, columb) {
 
         PlayerTurn = 1;
     }
+
+    title.textContent = "Player " + PlayerTurn + "\'s Turn";
 
     square.graphics.clear();
     square.graphics.beginFill(playerColor).drawRoundRect(0, 0, SubBoardSquareSize, SubBoardSquareSize, SubBoardSquareRadius).endFill();
