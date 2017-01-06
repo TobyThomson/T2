@@ -32,18 +32,28 @@ localGameButton.addEventListener("click", function(){
     gamePage.style.display = "block";
     backButton.style.display = "block";
 
-    title.textContent = "Your Turn";
-
+    updateTitleText();
     drawResponsiveElements();
 });
 
 backButton.addEventListener("click", function(){
+    goBackToMenu();
+});
+
+function goBackToMenu() {
     startPage.style.display = "block";
     gamePage.style.display = "none";
     backButton.style.display = "none";
 
-    title.textContent = "Player " + PlayerTurn + "\'s Turn";
-});
+    title.textContent = "UTTT";
+}
+
+function resetGame() {
+    CurrentSubBoard = "all";
+    OccupiedSquares = [];
+    CapturedBoards = [];
+    PlayerTurn = 1;
+}
 
 function drawResponsiveElements() {
     backButton.style.width = backButton.clientHeight;
@@ -118,7 +128,7 @@ function drawSubBoards() {
                 square.x = x;
                 square.y = y;
 
-                square.graphics.beginFill("#f0f0f0").drawRoundRect(0, 0, SubBoardSquareSize, SubBoardSquareSize, SubBoardSquareRadius).endFill();
+                square.graphics.beginFill("#c8c8c8").drawRoundRect(0, 0, SubBoardSquareSize, SubBoardSquareSize, SubBoardSquareRadius).endFill();
 
                 square.addEventListener("click", function(event) {
                     var squarePosition = event.target.name.split(",");
@@ -153,10 +163,6 @@ function drawSubBoards() {
     }
 }
 
-window.onresize = function(event) {
-    drawResponsiveElements();
-};
-
 function tryMove(subBoard, row, columb) {
     if (subBoard == CurrentSubBoard || CurrentSubBoard == "all") {
         if (OccupiedSquares[subBoard][row][columb] == 0) {
@@ -167,7 +173,6 @@ function tryMove(subBoard, row, columb) {
 
 function makeMove(subBoard, row, columb) {
     OccupiedSquares[subBoard][row][columb] = PlayerTurn;
-    CurrentSubBoard = ((row * 3) + columb);
 
     var square = stage.getChildByName(subBoard + "," + row + "," + columb);
 
@@ -183,28 +188,63 @@ function makeMove(subBoard, row, columb) {
         PlayerTurn = 1;
     }
 
-    title.textContent = "Player " + PlayerTurn + "\'s Turn";
-
     square.graphics.clear();
     square.graphics.beginFill(playerColor).drawRoundRect(0, 0, SubBoardSquareSize, SubBoardSquareSize, SubBoardSquareRadius).endFill();
 
     stage.update();
 
-    checkGameWon();
+    /*if (CurrentSubBoard != "all") {
+        checkSubBoardWon();
+        checkGameWon();
+    }*/
+
+    var selectedSubBoard = ((row * 3) + columb);
+
+    setCurrentSubBoard(selectedSubBoard);
+
+    updateTitleText();
 }
 
-function checkGameWon() {
-    var winningTeam;
+function updateTitleText() {
+    var playPosition = "(You may play in any square)";
 
+    if (CurrentSubBoard != "all") {
+        playPosition = "(You may play in square " + (CurrentSubBoard + 1) + ")"
+    }
+
+    title.innerHTML = "Player " + PlayerTurn + "\'s Turn " + playPosition;
+}
+
+function setCurrentSubBoard(selectedSubBoard) {
+    var subBoardFilled = true;
+
+    for (var row = 0; row < 3; row++) {
+        for (var columb = 0; columb < 3; columb++) {
+            if (OccupiedSquares[selectedSubBoard][row][columb] == 0) {
+                subBoardFilled = false;
+            }
+        }
+    }
+
+    if (subBoardFilled) {
+        CurrentSubBoard = "all";
+    }
+
+    else {
+        CurrentSubBoard = selectedSubBoard;
+    }
+}
+
+function checkSubBoardWon() {
     for (var row = 0; row < 3; row++) {
         var rowSum = OccupiedSquares[CurrentSubBoard][row].reduce(sumArray, 0);
 
         if (rowSum == (1 * 3)) {
-            winningTeam = 1;
+            CapturedBoards[CurrentSubBoard] = 1;
         }
 
         else if (rowSum == (2 * 3)) {
-            winningTeam = 2;
+            CapturedBoards[CurrentSubBoard] = 2;
         }
     }
 
@@ -212,32 +252,24 @@ function checkGameWon() {
         var columbSum = (OccupiedSquares[CurrentSubBoard][0][columb] + OccupiedSquares[CurrentSubBoard][1][columb] + OccupiedSquares[CurrentSubBoard][2][columb]);
 
         if (columbSum == (1 * 3)) {
-            winningTeam = 1;
+            CapturedBoards[CurrentSubBoard] = 1;
         }
 
         else if (columbSum == (2 * 3)) {
-            winningTeam = 2;
+            CapturedBoards[CurrentSubBoard] = 2;
         }
     }
 
-    if (winningTeam == 1) {
-        CapturedBoards[CurrentSubBoard] = 1;
-    }
-
-    else if (winningTeam == 2) {
-        CapturedBoards[CurrentSubBoard] = 2;
-    }
+    console.log(CapturedBoards.toString());
 }
 
-/*function checkGameWonh() {
+function checkGameWon() {
     var winningTeam;
 
     for (var i = 0; i < 3; i++) {
         var row = CapturedBoards.slice(i, (i + 3));
-    }
 
-    for (var row = 0; row < 3; row++) {
-        var rowSum = CapturedBoards[].reduce(sumArray, 0);
+        var rowSum = row.reduce(sumArray, 0);
 
         if (rowSum == (1 * 3)) {
             winningTeam = 1;
@@ -248,8 +280,8 @@ function checkGameWon() {
         }
     }
 
-    for (var columb = 0; columb < 3; columb++) {
-        var columbSum = (OccupiedSquares[CurrentSubBoard][0][columb] + OccupiedSquares[CurrentSubBoard][1][columb] + OccupiedSquares[CurrentSubBoard][2][columb]);
+    for (var i = 0; i < 3; i++) {
+        var columbSum = CapturedBoards[i] + CapturedBoards[(i + 3)] + CapturedBoards[(i + 6)];
 
         if (columbSum == (1 * 3)) {
             winningTeam = 1;
@@ -262,12 +294,18 @@ function checkGameWon() {
 
     if (winningTeam == 1) {
         console.log("team 1 wins");
+
+        resetGame();
+        goBackToMenu();
     }
 
     else if (winningTeam == 2) {
         console.log("team 2 wins");
+
+        resetGame();
+        goBackToMenu();
     }
-}*/
+}
 
 function sumArray(total, number) {
     return total + number;
