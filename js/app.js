@@ -1,6 +1,8 @@
 var BoardGridColor = "#0dab76";
 var BackGroundColor = "#f4f4f4";
 var SubBoardSquareColor = "#e0e0e2";
+var PlayerOneColor = "#2e86ab";
+var PlayerTwoColor = "#e71d36";
 
 var SubBoardSquareSizePercent = 8;
 var SubBoardSquareRadius = 4;
@@ -14,11 +16,16 @@ var gamePage = document.getElementById("game-page");
 var backButton = document.getElementById("back-button");
 var board = document.getElementById("board");
 
-var context = board.getContext('2d');
+var stage = new createjs.Stage(board);
 
 var boardSize;
 var sectionSize;
 var SubBoardSquareSize;
+
+var CurrentSubBoard = "all";
+var OccupiedSquares = [];
+var CapturedBoards = [];
+var PlayerTurn = 1;
 
 localGameButton.addEventListener("click", function(){
     startPage.style.display = "none";
@@ -59,57 +66,73 @@ function drawResponsiveElements() {
     board.width = boardSize;
     board.height = boardSize;
 
-    drawLines(10, BoardGridColor);
+    stage.removeAllChildren();
+
+    drawLines();
     drawSubBoards();
+
+    stage.update();
 }
 
-function drawLines(lineWidth, strokeStyle) {
+function drawLines() {
   var lineStart = 4;
-  var lineLenght = boardSize - 5;
-  context.lineWidth = lineWidth;
-  context.lineCap = 'round';
-  context.strokeStyle = strokeStyle;
-  context.beginPath();
+  var lineLength = boardSize - 5;
+
+  var grid = new createjs.Shape();
+
+  grid.graphics.setStrokeStyle(10, "round").beginStroke(BoardGridColor);
 
   for (var y = 1; y <= 2; y++) {
-    context.moveTo(lineStart, y * sectionSize);
-    context.lineTo(lineLenght, y * sectionSize);
+    grid.graphics.moveTo(lineStart, y * sectionSize);
+    grid.graphics.lineTo(lineLength, y * sectionSize);
   }
 
   for (var x = 1; x <= 2; x++) {
-    context.moveTo(x * sectionSize, lineStart);
-    context.lineTo(x * sectionSize, lineLenght);
+    grid.graphics.moveTo(x * sectionSize, lineStart);
+    grid.graphics.lineTo(x * sectionSize, lineLength);
   }
 
-  context.stroke();
+  stage.addChild(grid);
+
+  grid.graphics.endStroke();
 }
 
 function drawSubBoards() {
-    context.strokeStyle = SubBoardSquareColor;
-    context.fillStyle = SubBoardSquareColor;
-
     var squareSpacing = ((sectionSize - (SubBoardSquareSize * 3)) / 4);
 
     var x = squareSpacing;
     var y = squareSpacing;
 
-    context.moveTo(x, y);
-
     for (var subBoard = 1; subBoard <= 9; subBoard++) {
-        for (var row = 1; row <= 3; row++) {
-            for (var square = 1; square <= 3; square++) {
-                context.beginPath();
-                context.moveTo(x + SubBoardSquareRadius, y);
-                context.lineTo(x + SubBoardSquareSize - SubBoardSquareRadius, y);
-                context.quadraticCurveTo(x + SubBoardSquareSize, y, x + SubBoardSquareSize, y + SubBoardSquareRadius);
-                context.lineTo(x + SubBoardSquareSize, y + SubBoardSquareSize - SubBoardSquareRadius);
-                context.quadraticCurveTo(x + SubBoardSquareSize, y + SubBoardSquareSize, x + SubBoardSquareSize - SubBoardSquareRadius, y + SubBoardSquareSize);
-                context.lineTo(x + SubBoardSquareRadius, y + SubBoardSquareSize);
-                context.quadraticCurveTo(x, y + SubBoardSquareSize, x, y + SubBoardSquareSize - SubBoardSquareRadius);
-                context.lineTo(x, y + SubBoardSquareRadius);
-                context.quadraticCurveTo(x, y, x + SubBoardSquareRadius, y);
-                context.closePath();
-                context.fill();
+        OccupiedSquares.push([]);
+        CapturedBoards.push(0);
+
+        for (var row = 0; row < 3; row++) {
+            OccupiedSquares[(subBoard - 1)].push([]);
+
+            for (var columb = 0; columb < 3; columb++) {
+                var square = new createjs.Shape();
+
+                square.name = (subBoard - 1) + "," + row + "," + columb;
+
+                square.x = x;
+                square.y = y;
+
+                square.graphics.beginFill("#f0f0f0").drawRoundRect(0, 0, SubBoardSquareSize, SubBoardSquareSize, SubBoardSquareRadius).endFill();
+
+                square.addEventListener("click", function(event) {
+                    var squarePosition = event.target.name.split(",");
+
+                    var subBoard = parseInt(squarePosition[0]);
+                    var row = parseInt(squarePosition[1]);
+                    var columb = parseInt(squarePosition[2]);
+
+                    tryMove(subBoard, row, columb);
+                });
+
+                stage.addChild(square);
+
+                OccupiedSquares[(subBoard - 1)][row].push(0);
 
                 x += SubBoardSquareSize + squareSpacing;
             }
@@ -133,3 +156,117 @@ function drawSubBoards() {
 window.onresize = function(event) {
     drawResponsiveElements();
 };
+
+function tryMove(subBoard, row, columb) {
+    if (subBoard == CurrentSubBoard || CurrentSubBoard == "all") {
+        if (OccupiedSquares[subBoard][row][columb] == 0) {
+            makeMove(subBoard, row, columb);
+        }
+    }
+}
+
+function makeMove(subBoard, row, columb) {
+    OccupiedSquares[subBoard][row][columb] = PlayerTurn;
+    CurrentSubBoard = ((row * 3) + columb);
+
+    var square = stage.getChildByName(subBoard + "," + row + "," + columb);
+
+    var playerColor = PlayerOneColor;
+
+    if (PlayerTurn == 1) {
+        PlayerTurn = 2;
+    }
+
+    else if (PlayerTurn == 2) {
+        playerColor = PlayerTwoColor;
+
+        PlayerTurn = 1;
+    }
+
+    square.graphics.clear();
+    square.graphics.beginFill(playerColor).drawRoundRect(0, 0, SubBoardSquareSize, SubBoardSquareSize, SubBoardSquareRadius).endFill();
+
+    stage.update();
+
+    checkGameWon();
+}
+
+function checkGameWon() {
+    var winningTeam;
+
+    for (var row = 0; row < 3; row++) {
+        var rowSum = OccupiedSquares[CurrentSubBoard][row].reduce(sumArray, 0);
+
+        if (rowSum == (1 * 3)) {
+            winningTeam = 1;
+        }
+
+        else if (rowSum == (2 * 3)) {
+            winningTeam = 2;
+        }
+    }
+
+    for (var columb = 0; columb < 3; columb++) {
+        var columbSum = (OccupiedSquares[CurrentSubBoard][0][columb] + OccupiedSquares[CurrentSubBoard][1][columb] + OccupiedSquares[CurrentSubBoard][2][columb]);
+
+        if (columbSum == (1 * 3)) {
+            winningTeam = 1;
+        }
+
+        else if (columbSum == (2 * 3)) {
+            winningTeam = 2;
+        }
+    }
+
+    if (winningTeam == 1) {
+        CapturedBoards[CurrentSubBoard] = 1;
+    }
+
+    else if (winningTeam == 2) {
+        CapturedBoards[CurrentSubBoard] = 2;
+    }
+}
+
+/*function checkGameWonh() {
+    var winningTeam;
+
+    for (var i = 0; i < 3; i++) {
+        var row = CapturedBoards.slice(i, (i + 3));
+    }
+
+    for (var row = 0; row < 3; row++) {
+        var rowSum = CapturedBoards[].reduce(sumArray, 0);
+
+        if (rowSum == (1 * 3)) {
+            winningTeam = 1;
+        }
+
+        else if (rowSum == (2 * 3)) {
+            winningTeam = 2;
+        }
+    }
+
+    for (var columb = 0; columb < 3; columb++) {
+        var columbSum = (OccupiedSquares[CurrentSubBoard][0][columb] + OccupiedSquares[CurrentSubBoard][1][columb] + OccupiedSquares[CurrentSubBoard][2][columb]);
+
+        if (columbSum == (1 * 3)) {
+            winningTeam = 1;
+        }
+
+        else if (columbSum == (2 * 3)) {
+            winningTeam = 2;
+        }
+    }
+
+    if (winningTeam == 1) {
+        console.log("team 1 wins");
+    }
+
+    else if (winningTeam == 2) {
+        console.log("team 2 wins");
+    }
+}*/
+
+function sumArray(total, number) {
+    return total + number;
+}
