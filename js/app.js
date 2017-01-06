@@ -45,7 +45,7 @@ function goBackToMenu() {
     gamePage.style.display = "none";
     backButton.style.display = "none";
 
-    title.textContent = "UTTT";
+    title.innerHTML = "<span>T<sup>2</sup></span>";
 }
 
 function resetGame() {
@@ -212,7 +212,7 @@ function updateTitleText() {
         playPosition = "(You may play in square " + (CurrentSubBoard + 1) + ")"
     }
 
-    title.innerHTML = "Player " + PlayerTurn + "\'s Turn " + playPosition;
+    title.innerHTML = "<span>Player " + PlayerTurn + "\'s Turn " + playPosition + "</span>";
 }
 
 function setCurrentSubBoard(selectedSubBoard) {
