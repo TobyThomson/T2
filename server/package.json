@@ -1,0 +1,24 @@
+{
+  "name": "t2",
+  "version": "1.0.0",
+  "description": "A beautiful ultimate naughts and crosses game built for the web. Enjoy!",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TobyThomson/T2.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TobyThomson/T2/issues"
+  },
+  "homepage": "https://github.com/TobyThomson/T2#readme",
+  "dependencies": {
+    "express": "^4.14.0",
+    "shortid": "^2.2.6",
+    "socket.io": "^1.7.2"
+  }
+}
