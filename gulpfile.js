@@ -5,6 +5,7 @@ var clean = require('gulp-clean');
 var cssmin = require('gulp-cssmin');
 var pipeline = require('readable-stream').pipeline;
 var merge = require('merge-stream');
+var exec = require('child_process').exec;
 
 function cleanup () {
     return pipeline(
@@ -38,14 +39,23 @@ function build () {
     return merge(index, js, css);
 }
 
-// TODO: Add Cypress testing here
 function test (cb) {
-    cb();
+    exec('npx cypress run', function (err, stdout, stderr) {
+        console.log(stdout);
+        console.log(stderr);
+
+        cb(err);
+    });
 }
 
-// TODO: Add server start and firefox open here
 function inspect (cb) {
     build();
+
+    exec('npx cypress open --detached', function (err, stdout, stderr) {
+        console.log(stdout);
+        console.log(stderr);
+    });
+
     cb();
 }
 
