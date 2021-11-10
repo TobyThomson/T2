@@ -5,34 +5,30 @@ var clean = require('gulp-clean');
 var pipeline = require('readable-stream').pipeline;
 var merge = require('merge-stream');
 
-function cleanup (cb) {
+function cleanup () {
     return pipeline(
         gulp.src('bundle/*', {read: false}),
         clean()
     );
-
-    cb();
 }
 
-// TODO: Add bundling feature here
-function build (cb) {
-    cleanup(cb);
+// TODO: Add CSS bundling feature here
+function build () {
+    cleanup();
 
-    var first = pipeline(
+    var index = pipeline(
         gulp.src('index.html'),
         gulp.dest('bundle/')
     );
 
-    var second = pipeline(
+    var js = pipeline(
         gulp.src('js/*'),
         uglify(),
         concat('bundle.js'),
         gulp.dest('bundle')
     );
 
-    return merge(second);
-
-    cb();
+    return merge(index, js);
 }
 
 // TODO: Add Cypress testing here
