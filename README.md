@@ -8,12 +8,12 @@ Enjoy!
 2. Cypress: Unit + Functionality testing (possibly all falls under the "end-to-end" testing umbrella.
 
 ## Plan of Attack
-1. Setup node
-2. Implement build framework (includes bundling)
-3. Implement test framework
-4. Write first set of tests
-5. Draw UI
-6. Use ServiceWorkers to allow the app to work offline.
+1. [x] Setup node
+2. [x] Implement build framework (includes bundling)
+3. [x] Implement test framework
+4. [ ] Write first set of tests
+5. [ ] Draw UI
+6. [ ] Use ServiceWorkers to allow the app to work offline.
 
 ## Desired Feature List
 1. Carry on using the app once internet connection lost
