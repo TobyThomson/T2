@@ -3,6 +3,8 @@ A beautiful (though I do say so myself) ultimate tic tac toe game for the web. B
 
 Enjoy!
 
+This is an addition to the README
+
 ## Tools to Implement
 1. Gulp: Automates everything
 2. Cypress: Unit + Functionality testing (possibly all falls under the "end-to-end" testing umbrella.
