@@ -2,6 +2,7 @@ var gulp = require('gulp');
 var uglify = require('gulp-uglify');
 var concat = require('gulp-concat');
 var clean = require('gulp-clean');
+var cssmin = require('gulp-cssmin');
 var pipeline = require('readable-stream').pipeline;
 var merge = require('merge-stream');
 
@@ -12,7 +13,6 @@ function cleanup () {
     );
 }
 
-// TODO: Add CSS bundling feature here
 function build () {
     cleanup();
 
@@ -24,11 +24,18 @@ function build () {
     var js = pipeline(
         gulp.src('js/*'),
         uglify(),
-        concat('bundle.js'),
+        concat('bundle.min.js'),
         gulp.dest('bundle')
     );
 
-    return merge(index, js);
+    var css = pipeline(
+        gulp.src('css/*'),
+        cssmin(),
+        concat('bundle.min.css'),
+        gulp.dest('bundle')
+    );
+
+    return merge(index, js, css);
 }
 
 // TODO: Add Cypress testing here
