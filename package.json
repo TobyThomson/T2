@@ -17,6 +17,13 @@
   },
   "homepage": "https://github.com/TobyThomson/T2#readme",
   "devDependencies": {
-    "gulp": "^4.0.2"
+    "gulp": "^4.0.2",
+    "gulp-clean": "^0.4.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-uglify": "^3.0.2",
+    "merge-stream": "^2.0.0"
+  },
+  "dependencies": {
+    "readable-stream": "^3.6.0"
   }
 }
