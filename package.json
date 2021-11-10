@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/TobyThomson/T2#readme",
   "devDependencies": {
+    "cypress": "^8.7.0",
     "gulp": "^4.0.2",
     "gulp-clean": "^0.4.0",
     "gulp-concat": "^2.6.1",
