@@ -8,21 +8,24 @@ Enjoy!
 2. Cypress: Unit + Functionality testing (possibly all falls under the "end-to-end" testing umbrella.
 
 ## Plan of Attack
-1. [x] Setup node
+1. [x] Setup NodeJS
 2. [x] Implement build framework (includes bundling)
 3. [x] Implement test framework
 4. [ ] Write first set of tests
-5. [ ] Draw UI
-6. [ ] Use ServiceWorkers to allow the app to work offline.
+5. [ ] Use ServiceWorkers to allow the app to work offline.
+6. [ ] Write UI tests
+7. [ ] Draw UI
+8. [ ] Write simple game logic tests
+9. [ ] Implement simple game logic
 
 ## Desired Feature List
-1. Carry on using the app once internet connection lost
-2. Detect if the other player has disconnected (heartbeat?)
-3. Choose local or online game
-4. Detect which player has won and end the game once someone has won
-5. Manage player turns
-6. Illustrate who's turn it is and which square they may play in
-7. Resize to different computer screens and work on laptops and phones (resize live as required)
-8. Vey fast (no silly bloat)
-9. Display which version of the app we're using (useful for knowing if game has updated once back online)
-10. Notifiy user if the app has been updated if brought back online.
+* Carry on using the app once internet connection lost
+* Detect if the other player has disconnected (heartbeat?)
+* Choose local or online game
+* Detect which player has won and end the game once someone has won
+* Manage player turns
+* Illustrate who's turn it is and which square they may play in
+* Resize to different computer screens and work on laptops and phones (resize live as required)
+* Vey fast (no silly bloat)
+* Display which version of the app we're using (useful for knowing if game has updated once back online)
+* Notifiy user if the app has been updated if brought back online.
